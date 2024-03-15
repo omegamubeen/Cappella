@@ -1,6 +1,5 @@
 package com.app.cappella
 
-import android.app.DatePickerDialog
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -25,13 +24,11 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,7 +43,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -56,7 +52,6 @@ import com.app.cappella.model.BabyProfile
 import com.app.cappella.model.BabyProfileState
 import com.app.cappella.viewmodel.BabyProfileViewModel
 import java.net.URI
-import java.util.Calendar
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -138,7 +133,7 @@ fun ProfileUI(babyProfile: BabyProfile, viewModel: BabyProfileViewModel) {
                 viewModel.updateBabyProfile(context, babyProfile.id, name, dob, gender, it)
             }
             FormField(label = "Name / Nickname *", value = name, onValueChange = { name = it }, modifier = Modifier.fillMaxWidth())
-            DatePickerField(label = "Date of birth", value = dob, onDateSelected = { dob = it }, modifier = Modifier.fillMaxWidth())
+            FormField(label = "Date of birth", value = dob, onValueChange = { dob = it }, modifier = Modifier.fillMaxWidth())
             GenderDropdown(selectedGender = gender, onGenderSelect = { gender = it })
             Spacer(modifier = Modifier.height(16.dp))
             Button(
@@ -153,48 +148,6 @@ fun ProfileUI(babyProfile: BabyProfile, viewModel: BabyProfileViewModel) {
             }
         }
     }
-}
-
-@Composable
-fun DatePickerField(label: String, value: String, onDateSelected: (String) -> Unit, modifier: Modifier) {
-    val context = LocalContext.current
-    var showDialog by remember { mutableStateOf(false) }
-
-    // Listen for showDialog changes to display the DatePickerDialog
-    if (showDialog) {
-        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-        val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
-        val currentDayOfMonth = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-
-        DatePickerDialog(
-            context, { _, year, monthOfYear, dayOfMonth ->
-                // Format the selected date and pass it to onDateSelected
-                onDateSelected("$year-${monthOfYear + 1}-${dayOfMonth}")
-                showDialog = false
-            }, currentYear, currentMonth, currentDayOfMonth
-        ).show()
-    }
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = {}, // No action on value change as it's read-only
-        label = { Text(label) },
-        readOnly = true, // Make the text field read-only
-        modifier = modifier
-            .clickable { showDialog = true }, // Show dialog on click
-    )
-}
-
-
-@Composable
-fun FormField(label: String, value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        modifier = modifier.padding(top = 20.dp),
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
-    )
 }
 
 @Composable
@@ -238,6 +191,18 @@ fun ProfilePicture(profileImageUrl: String, onImageSelected: (Uri) -> Unit) {
     }
 }
 
+
+@Composable
+fun FormField(label: String, value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        modifier = modifier.padding(top = 20.dp),
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
+    )
+}
+
 @Composable
 fun GenderDropdown(selectedGender: String, onGenderSelect: (String) -> Unit) {
     val items = listOf("male", "female")
@@ -248,6 +213,7 @@ fun GenderDropdown(selectedGender: String, onGenderSelect: (String) -> Unit) {
 
     Box(
         modifier = Modifier
+            .padding(top = 20.dp)
             .fillMaxWidth()
             .border(
                 width = 1.dp,
@@ -284,4 +250,3 @@ fun GenderDropdown(selectedGender: String, onGenderSelect: (String) -> Unit) {
         }
     }
 }
-
